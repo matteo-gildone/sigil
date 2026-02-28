@@ -26,7 +26,7 @@ Set up the module and directory structure. No logic yet, just the skeleton.
 - Write a `Makefile` with a `build` target
 
 **Done when:** 
-- [ ] `go build ./...` passes with no errors.
+- [x] `go build ./...` passes with no errors.
 
 ---
 
