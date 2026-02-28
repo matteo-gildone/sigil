@@ -2,7 +2,7 @@
 
 ---
 
-## - [ ] Card 01 — Project scaffold
+## Card 01 — Project scaffold
 
 Set up the module and directory structure. No logic yet, just the skeleton.
 
@@ -25,7 +25,8 @@ Set up the module and directory structure. No logic yet, just the skeleton.
 - Write a `main.go` that prints `"sigil"` and exits cleanly
 - Write a `Makefile` with a `build` target
 
-**Done when:** `go build ./...` passes with no errors.
+**Done when:** 
+- [ ] `go build ./...` passes with no errors.
 
 ---
 
@@ -39,7 +40,8 @@ Build the command routing layer. No subcommand logic yet — just the skeleton t
 - Print a usage message for unknown commands
 - Print per-command usage when called with no args
 
-**Done when:** `sigil set`, `sigil get`, `sigil exec` etc. each print their own placeholder message. `sigil foo` prints an error.
+**Done when:** 
+- [ ] `sigil set`, `sigil get`, `sigil exec` etc. each print their own placeholder message. `sigil foo` prints an error.
 
 ---
 
@@ -54,7 +56,8 @@ Implement the XDG base directory logic so sigil knows where to read and write fi
 - Create directories if they don't exist (`os.MkdirAll`)
 - Write table-driven tests for all three functions
 
-**Done when:** Tests pass. Calling `ProjectPath("default")` returns the correct path on your machine.
+**Done when:** 
+- [ ] Tests pass. Calling `ProjectPath("default")` returns the correct path on your machine.
 
 ---
 
@@ -68,7 +71,8 @@ Implement secure passphrase reading from the terminal.
 - Print the prompt, read without echo, print a newline after
 - Return an error if stdin is not a terminal
 
-**Done when:** Running a test binary prompts for a passphrase and the input is not visible.
+**Done when:** 
+- [ ] Running a test binary prompts for a passphrase and the input is not visible.
 
 ---
 
@@ -91,7 +95,8 @@ Implement encrypt and decrypt using the stdlib. This is the hardest card — tak
   - Wrong passphrase returns an error
   - Two encryptions of the same plaintext produce different ciphertexts (random nonce)
 
-**Done when:** All tests pass.
+**Done when:** 
+- [ ] All tests pass.
 
 ---
 
@@ -107,7 +112,8 @@ Implement the store: load, save, get, set, delete, list. No encryption wired in 
 - Write table-driven tests for all operations
 - Test that `Save` followed by `Load` round-trips correctly
 
-**Done when:** All tests pass. You can save a store to disk and load it back.
+**Done when:** 
+- [ ] All tests pass. You can save a store to disk and load it back.
 
 ---
 
@@ -122,7 +128,8 @@ Connect the crypto and store layers so the file on disk is always encrypted.
 - Test that the file on disk is not readable as plain JSON
 - Test that loading with a wrong passphrase returns a clear error
 
-**Done when:** The store file on disk is encrypted. Tests pass.
+**Done when:** 
+- [ ] The store file on disk is encrypted. Tests pass.
 
 ---
 
@@ -136,7 +143,8 @@ Wire the first two real commands end to end.
 - Handle the case where the store file doesn't exist yet (`set` should create it)
 - Print a clear error if the wrong passphrase is given
 
-**Done when:** You can `sigil set DB_URL "postgres://..."` and then `sigil get DB_URL` and get the value back.
+**Done when:** 
+- [ ] You can `sigil set DB_URL "postgres://..."` and then `sigil get DB_URL` and get the value back.
 
 ---
 
@@ -148,7 +156,8 @@ Wire the first two real commands end to end.
 - `sigil delete KEY` — prompts for passphrase, removes key, saves, confirms deletion
 - Print a clear error if the key doesn't exist
 
-**Done when:** All four commands work end to end.
+**Done when:** 
+- [ ] All four commands work end to end.
 
 ---
 
@@ -164,7 +173,8 @@ Implement secret injection via `syscall.Exec`.
 - Create `internal/cli/exec_windows.go` with build tag `//go:build windows` using `exec.Command` as fallback
 - Test that the target process receives the injected env vars
 
-**Done when:** `sigil exec -- env | grep DB_URL` prints the stored value.
+**Done when:** 
+- [ ] `sigil exec -- env | grep DB_URL` prints the stored value.
 
 ---
 
@@ -180,7 +190,8 @@ Go through every command and make sure errors are handled correctly and consiste
 - Wrong passphrase gives a clear message, not a raw crypto error
 - Missing key gives a clear message
 
-**Done when:** `go vet ./...` passes clean. Every error path has been manually tested.
+**Done when:** 
+- [ ] `go vet ./...` passes clean. Every error path has been manually tested.
 
 ---
 
@@ -194,14 +205,7 @@ Make sigil installable and releasable.
 - Tag `v0.1.0`
 - Set up a GitHub Actions workflow that builds and attaches binaries on tag push
 
-**Done when:** `v0.1.0` is tagged, binaries are attached to the GitHub release, README is complete.
+**Done when:** 
+- [ ] `v0.1.0` is tagged, binaries are attached to the GitHub release, README is complete.
 
 ---
-
-## Order of play
-
-```
-01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 09 → 10 → 11 → 12
-```
-
-Cards 05 and 10 are the hardest. Don't rush them.
