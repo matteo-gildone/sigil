@@ -59,3 +59,41 @@ func TestConfigDirNoEnvDir(t *testing.T) {
 		t.Errorf("want: %q, got: %q", want, got)
 	}
 }
+
+func TestProjectPath(t *testing.T) {
+	dataHome := t.TempDir()
+	t.Setenv("XDG_DATA_HOME", dataHome)
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{
+			"create project 1",
+			"project1",
+			filepath.Join(dataHome, "sigil", "project1"),
+		},
+		{
+			"create project 2",
+			"project2",
+			filepath.Join(dataHome, "sigil", "project2"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ProjectPath(tt.input)
+			if err != nil {
+				t.Fatalf("expected no error got: %v", err)
+			}
+
+			if _, err := os.Stat(got); err != nil {
+				t.Fatalf("expected path to exist: %v", err)
+			}
+
+			if got != tt.want {
+				t.Errorf("want %q, got %q", tt.want, got)
+			}
+		})
+	}
+}
