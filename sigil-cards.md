@@ -41,7 +41,7 @@ Build the command routing layer. No subcommand logic yet — just the skeleton t
 - Print per-command usage when called with no args
 
 **Done when:** 
-- [ ] `sigil set`, `sigil get`, `sigil exec` etc. each print their own placeholder message. `sigil foo` prints an error.
+- [x] `sigil set`, `sigil get`, `sigil exec` etc. each print their own placeholder message. `sigil foo` prints an error.
 
 ---
 

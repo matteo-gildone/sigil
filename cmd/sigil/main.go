@@ -12,6 +12,7 @@ var commands = []*command.Command{
 	command.GetCmd,
 	command.ListCmd,
 	command.DeleteCmd,
+	command.ExecCmd,
 }
 
 func main() {
@@ -24,7 +25,7 @@ func main() {
 		if cmd.Name == os.Args[1] {
 			err := cmd.Run(os.Args[2:])
 			if err != nil {
-				fmt.Errorf("%q failed: %w", cmd.Name, err)
+				fmt.Fprintf(os.Stderr, "%q failed: %v", cmd.Name, err)
 				os.Exit(1)
 			}
 			return
@@ -40,9 +41,7 @@ func usage() {
 		panic(err)
 	}
 	for _, cmd := range commands {
-		if _, err := fmt.Fprintf(os.Stderr, "  %s: %s\n", cmd.Name, cmd.Usage); err != nil {
-			panic(err)
-		}
+		fmt.Fprintf(os.Stderr, "  %s: %s\n", cmd.Name, cmd.Usage)
 	}
 	os.Exit(1)
 }
