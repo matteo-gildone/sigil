@@ -1,6 +1,10 @@
 package xdg
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 func TestDataDirEnvDir(t *testing.T) {
 	t.Setenv("XDG_DATA_HOME", "/my/random/path")
@@ -17,10 +21,9 @@ func TestDataDirEnvDir(t *testing.T) {
 }
 
 func TestDataDirNoEnvDir(t *testing.T) {
-	tempHome := t.TempDir()
-	t.Setenv("HOME", tempHome)
 	t.Setenv("XDG_DATA_HOME", "")
-	want := tempHome + "/.local/share/sigil"
+	homeDir, _ := os.UserHomeDir()
+	want := filepath.Join(homeDir, ".local", "share", "sigil")
 	got, err := DataDir()
 	if err != nil {
 		t.Fatalf("expected no errors, got: %v", err)
@@ -45,10 +48,9 @@ func TestConfigDirEnvDir(t *testing.T) {
 }
 
 func TestConfigDirNoEnvDir(t *testing.T) {
-	tempHome := t.TempDir()
-	t.Setenv("HOME", tempHome)
 	t.Setenv("XDG_CONFIG_HOME", "")
-	want := tempHome + "/.config/sigil"
+	homeDir, _ := os.UserHomeDir()
+	want := filepath.Join(homeDir, ".config", "sigil")
 	got, err := ConfigDir()
 	if err != nil {
 		t.Fatalf("expected no errors, got: %v", err)

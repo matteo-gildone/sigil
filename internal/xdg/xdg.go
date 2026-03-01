@@ -35,7 +35,8 @@ func ProjectPath(project string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get data directory: %w", err)
 	}
-	path := fmt.Sprintf("%s/%s", dataDir, project)
+
+	path := filepath.Join(dataDir, project)
 	if err := os.MkdirAll(path, 0o700); err != nil {
 		return "", fmt.Errorf("failed to create directory: %w", err)
 	}
