@@ -37,9 +37,7 @@ func main() {
 }
 
 func usage() {
-	if _, err := fmt.Fprintf(os.Stderr, "Usage sigil:\n"); err != nil {
-		panic(err)
-	}
+	fmt.Fprintf(os.Stderr, "Usage sigil:\n")
 	for _, cmd := range commands {
 		fmt.Fprintf(os.Stderr, "  %s: %s\n", cmd.Name, cmd.Usage)
 	}
