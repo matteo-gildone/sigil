@@ -69,6 +69,11 @@ func TestProjectPath(t *testing.T) {
 		want  string
 	}{
 		{
+			"create default",
+			"default",
+			filepath.Join(dataHome, "sigil", "default"),
+		},
+		{
 			"create project 1",
 			"project1",
 			filepath.Join(dataHome, "sigil", "project1"),

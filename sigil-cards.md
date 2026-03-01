@@ -57,7 +57,7 @@ Implement the XDG base directory logic so sigil knows where to read and write fi
 - Write table-driven tests for all three functions
 
 **Done when:** 
-- [ ] Tests pass. Calling `ProjectPath("default")` returns the correct path on your machine.
+- [x] Tests pass. Calling `ProjectPath("default")` returns the correct path on your machine.
 
 ---
 
