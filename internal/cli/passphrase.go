@@ -8,11 +8,11 @@ import (
 	"golang.org/x/term"
 )
 
-var ErrIsNotTerminal = errors.New("passphrase input requires an interactive terminal")
+var ErrNotTerminal = errors.New("passphrase input requires an interactive terminal")
 
 func PromptPassphrase(prompt string, fd int) ([]byte, error) {
 	if !term.IsTerminal(fd) {
-		return nil, ErrIsNotTerminal
+		return nil, ErrNotTerminal
 	}
 
 	fmt.Fprint(os.Stderr, prompt)

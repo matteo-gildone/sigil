@@ -7,8 +7,9 @@ import (
 )
 
 func TestPromptPassphrase(t *testing.T) {
-	r, _, _ := os.Pipe()
+	r, w, _ := os.Pipe()
 	defer r.Close()
+	defer w.Close()
 
 	_, err := PromptPassphrase("", int(r.Fd()))
 
@@ -16,8 +17,8 @@ func TestPromptPassphrase(t *testing.T) {
 		t.Fatal("expected error when stdin is not a terminal")
 	}
 
-	if !errors.Is(err, ErrIsNotTerminal) {
-		t.Errorf("expected %v, got %v", ErrIsNotTerminal, err)
+	if !errors.Is(err, ErrNotTerminal) {
+		t.Errorf("expected %v, got %v", ErrNotTerminal, err)
 	}
 
 }
