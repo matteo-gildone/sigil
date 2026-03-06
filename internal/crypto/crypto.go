@@ -15,7 +15,7 @@ func generateSalt(n int) ([]byte, error) {
 
 	_, err := rand.Read(salt)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate salt")
+		return nil, fmt.Errorf("failed to generate salt: %w", err)
 	}
 
 	return salt, nil
@@ -49,7 +49,7 @@ func Encrypt(passphrase, plaintext []byte) ([]byte, error) {
 	}
 	ciphertext := aesgcm.Seal(nonce, nonce, plaintext, nil)
 
-	return ciphertext, nil
+	return append(salt, ciphertext...), nil
 }
 
 //func Decrypt(passphrase, data []byte) ([]byte, error) {}
