@@ -6,9 +6,13 @@ import (
 	"crypto/pbkdf2"
 	"crypto/rand"
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"io"
 )
+
+var ErrData = errors.New("data is too short to be valid encrypted blob")
+var ErrDecryptionFailed = errors.New("decryption failed: wrong passphrase or corrupted data")
 
 func generateSalt(n int) ([]byte, error) {
 	salt := make([]byte, n)
@@ -53,6 +57,9 @@ func Encrypt(passphrase, plaintext []byte) ([]byte, error) {
 }
 
 func Decrypt(passphrase, data []byte) ([]byte, error) {
+	if len(data) < 44 {
+		return nil, ErrData
+	}
 	salt := data[:16]
 	rest := data[16:]
 
@@ -76,7 +83,7 @@ func Decrypt(passphrase, data []byte) ([]byte, error) {
 
 	plaintext, err := aesgcm.Open(nonce, nonce, ciphertext, nil)
 	if err != nil {
-		return nil, fmt.Errorf("decryption failed: wrong passphrase or corrupted data")
+		return nil, ErrDecryptionFailed
 	}
 
 	return plaintext, nil
