@@ -52,4 +52,32 @@ func Encrypt(passphrase, plaintext []byte) ([]byte, error) {
 	return append(salt, ciphertext...), nil
 }
 
-//func Decrypt(passphrase, data []byte) ([]byte, error) {}
+func Decrypt(passphrase, data []byte) ([]byte, error) {
+	salt := data[:16]
+	rest := data[16:]
+
+	key, err := pbkdf2.Key(sha256.New, string(passphrase), salt, 260000, 32)
+	if err != nil {
+		return nil, err
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	aesgcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	nonce := rest[:aesgcm.NonceSize()]
+	ciphertext := rest[aesgcm.NonceSize():]
+
+	plaintext, err := aesgcm.Open(nonce, nonce, ciphertext, nil)
+	if err != nil {
+		return nil, fmt.Errorf("decryption failed: wrong passphrase or corrupted data")
+	}
+
+	return plaintext, nil
+}
