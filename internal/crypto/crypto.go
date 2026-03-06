@@ -81,7 +81,7 @@ func Decrypt(passphrase, data []byte) ([]byte, error) {
 	nonce := rest[:aesgcm.NonceSize()]
 	ciphertext := rest[aesgcm.NonceSize():]
 
-	plaintext, err := aesgcm.Open(nonce, nonce, ciphertext, nil)
+	plaintext, err := aesgcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
 		return nil, ErrDecryptionFailed
 	}
