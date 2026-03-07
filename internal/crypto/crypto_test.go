@@ -8,18 +8,18 @@ import (
 func TestEncrypt(t *testing.T) {
 	passphrase := "passphrase"
 	plaintext := "plaintext"
-	encrypted, err := Encrypt([]byte(passphrase), []byte(plaintext))
+	first, err := Encrypt([]byte(passphrase), []byte(plaintext))
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
 	}
 
-	encryptedTwice, err := Encrypt([]byte(passphrase), encrypted)
+	second, err := Encrypt([]byte(passphrase), []byte(plaintext))
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
 	}
 
-	if string(encrypted) == string(encryptedTwice) {
-		t.Error("expected to not be the same")
+	if string(first) == string(second) {
+		t.Error("expected different ciphertexts for same inout")
 	}
 }
 
@@ -28,7 +28,9 @@ func TestDecrypt(t *testing.T) {
 	wrongPassphrase := "asdasdfdsf"
 	plaintext := "plaintext"
 	encrypted, err := Encrypt([]byte(passphrase), []byte(plaintext))
-
+	if err != nil {
+		t.Fatalf("expected no error got:%v", err)
+	}
 	_, err = Decrypt([]byte(wrongPassphrase), encrypted)
 
 	if err == nil {
@@ -49,7 +51,9 @@ func TestRoundtrip(t *testing.T) {
 	}
 
 	decrypted, err := Decrypt([]byte(passphrase), encrypted)
-
+	if err != nil {
+		t.Fatalf("expected no error got:%v", err)
+	}
 	if string(decrypted) != plaintext {
 		t.Errorf("want: %q, got: %q", plaintext, string(decrypted))
 	}
