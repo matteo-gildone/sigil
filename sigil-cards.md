@@ -72,7 +72,7 @@ Implement secure passphrase reading from the terminal.
 - Return an error if stdin is not a terminal
 
 **Done when:** 
-- [ ] Running a test binary prompts for a passphrase and the input is not visible.
+- [x] Running a test binary prompts for a passphrase and the input is not visible.
 
 ---
 
@@ -96,7 +96,7 @@ Implement encrypt and decrypt using the stdlib. This is the hardest card — tak
   - Two encryptions of the same plaintext produce different ciphertexts (random nonce)
 
 **Done when:** 
-- [ ] All tests pass.
+- [x] All tests pass.
 
 ---
 

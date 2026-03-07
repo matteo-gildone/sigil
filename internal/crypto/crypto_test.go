@@ -19,7 +19,7 @@ func TestEncrypt(t *testing.T) {
 	}
 
 	if string(first) == string(second) {
-		t.Error("expected different ciphertexts for same inout")
+		t.Error("expected different ciphertexts for same input")
 	}
 }
 
