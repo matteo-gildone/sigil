@@ -17,7 +17,7 @@ func Load(path string) (*Store, error) {
 
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return &Store{}, nil
+			return &Store{path: path, Secrets: map[string]string{}}, nil
 		}
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}

@@ -45,7 +45,7 @@ func TestStore_Load(t *testing.T) {
 			}
 
 			if len(s.Secrets) != tt.wantCount {
-				t.Errorf("expected %d colleagues, got %d", tt.wantCount, len(s.Secrets))
+				t.Errorf("expected %d secrets, got %d", tt.wantCount, len(s.Secrets))
 			}
 
 		})
@@ -82,6 +82,10 @@ func TestStore_LoadError(t *testing.T) {
 			}
 
 			s, err := Load(testFile)
+
+			if err == nil {
+				t.Fatalf("expected error, got nil")
+			}
 
 			if s != nil {
 				t.Error("expected nil list of secrets on error")
