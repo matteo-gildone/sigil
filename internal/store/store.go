@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
 )
 
 type Store struct {
@@ -31,8 +32,37 @@ func Load(path string) (*Store, error) {
 	return s, nil
 }
 
-//func (s *Store) Save() error                   {}
-//func (s *Store) Set(key, value string) error   {}
-//func (s *Store) Get(key string) (string, bool) {}
-//func (s *Store) Delete(key string) error       {}
-//func (s *Store) List() []string                {}
+func (s *Store) Save() error {
+	js, err := json.Marshal(s)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(s.path, js, 0600)
+}
+
+func (s *Store) Set(key, value string) error {
+	s.Secrets[key] = value
+	return nil
+}
+
+func (s *Store) Get(key string) (string, bool) {
+	v, ok := s.Secrets[key]
+	return v, ok
+}
+
+func (s *Store) Delete(key string) {
+	delete(s.Secrets, key)
+}
+
+func (s *Store) List() []string {
+	keys := make([]string, 0, len(s.Secrets))
+
+	for commentType := range s.Secrets {
+		keys = append(keys, commentType)
+	}
+
+	sort.Strings(keys)
+
+	return keys
+}
