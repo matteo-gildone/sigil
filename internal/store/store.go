@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 )
 
@@ -33,17 +34,35 @@ func Load(path string) (*Store, error) {
 }
 
 func (s *Store) Save() error {
-	js, err := json.Marshal(s)
+	data, err := json.Marshal(s)
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile(s.path, js, 0600)
+	tmp, err := os.CreateTemp(filepath.Dir(s.path), ".sigil-*.tmp")
+	if err != nil {
+		return err
+	}
+
+	defer os.Remove(tmp.Name())
+
+	if _, err := tmp.Write(data); err != nil {
+		return err
+	}
+
+	if err := tmp.Sync(); err != nil {
+		return err
+	}
+
+	if err := tmp.Close(); err != nil {
+		return err
+	}
+
+	return os.Rename(tmp.Name(), s.path)
 }
 
-func (s *Store) Set(key, value string) error {
+func (s *Store) Set(key, value string) {
 	s.Secrets[key] = value
-	return nil
 }
 
 func (s *Store) Get(key string) (string, bool) {
@@ -58,8 +77,8 @@ func (s *Store) Delete(key string) {
 func (s *Store) List() []string {
 	keys := make([]string, 0, len(s.Secrets))
 
-	for commentType := range s.Secrets {
-		keys = append(keys, commentType)
+	for key := range s.Secrets {
+		keys = append(keys, key)
 	}
 
 	sort.Strings(keys)
