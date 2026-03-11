@@ -298,7 +298,7 @@ func TestStore_Save(t *testing.T) {
 			}
 
 			if len(loaded.Secrets) != tt.expectedLength {
-				t.Errorf("expected %d colleagues, got %d", tt.expectedLength, len(loaded.Secrets))
+				t.Errorf("expected %d keys, got %d", tt.expectedLength, len(loaded.Secrets))
 			}
 		})
 	}
@@ -358,11 +358,6 @@ func TestStore_Save(t *testing.T) {
 func TestStore_RoundTrip(t *testing.T) {
 	tempDir := t.TempDir()
 	testFile := filepath.Join(tempDir, "secrets.json")
-
-	err := os.WriteFile(testFile, []byte("{ \"secrets\": {} }"), 0600)
-	if err != nil {
-		t.Fatalf("failed to create test file: %v", err)
-	}
 
 	s, err := Load(testFile)
 

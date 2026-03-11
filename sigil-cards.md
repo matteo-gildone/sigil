@@ -113,7 +113,7 @@ Implement the store: load, save, get, set, delete, list. No encryption wired in 
 - Test that `Save` followed by `Load` round-trips correctly
 
 **Done when:** 
-- [ ] All tests pass. You can save a store to disk and load it back.
+- [x] All tests pass. You can save a store to disk and load it back.
 
 ---
 
