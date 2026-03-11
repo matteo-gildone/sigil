@@ -1,8 +1,10 @@
 package store
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 )
 
@@ -139,13 +141,13 @@ func TestStore_Set(t *testing.T) {
 
 func TestStore_Get(t *testing.T) {
 	s := &Store{Secrets: map[string]string{
-		"AWS_KEY": "sddfdgdfgfghghgf",
+		"AWS_KEY": "my-aws-key",
 	}}
 
 	v, ok := s.Get("AWS_KEY")
 
-	if v != "sddfdgdfgfghghgf" {
-		t.Errorf("want: %q, got: %q", "sddfdgdfgfghghgf", v)
+	if v != "my-aws-key" {
+		t.Errorf("want: %q, got: %q", "my-aws-key", v)
 	}
 
 	if !ok {
@@ -165,4 +167,179 @@ func TestStore_GetNoKey(t *testing.T) {
 	if ok {
 		t.Errorf("expected false, got: %T", ok)
 	}
+}
+
+func TestStore_List(t *testing.T) {
+	s := &Store{
+		Secrets: map[string]string{
+			"OPENAI_KEY": "my-openai-key",
+			"AWS_KEY":    "my-aws-key",
+		},
+	}
+
+	want := []string{"AWS_KEY", "OPENAI_KEY"}
+
+	got := s.List()
+
+	if !slices.Equal(want, got) {
+		t.Errorf("want: %v, got: %v", want, got)
+	}
+}
+
+func TestStore_Delete(t *testing.T) {
+	tests := []struct {
+		name           string
+		key            string
+		expectedLength int
+	}{
+		{
+			name:           "delete existing key",
+			key:            "OPENAI_KEY",
+			expectedLength: 1,
+		},
+		{
+			name:           "keys already present",
+			key:            "RANDOM_KEY",
+			expectedLength: 2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Store{
+				Secrets: map[string]string{
+					"OPENAI_KEY": "my-openai-key",
+					"AWS_KEY":    "my-aws-key",
+				},
+			}
+
+			s.Delete(tt.key)
+
+			if len(s.List()) != tt.expectedLength {
+				t.Errorf("want: %d, got: %d", 1, len(s.List()))
+			}
+			_, ok := s.Get(tt.key)
+
+			if ok {
+				t.Errorf("%q shouldn't exists", tt.key)
+			}
+		})
+	}
+}
+
+func TestStore_Save(t *testing.T) {
+	tests := []struct {
+		name           string
+		secrets        map[string]string
+		expectedLength int
+	}{
+		{
+			name:           "empty colleague list",
+			secrets:        map[string]string{},
+			expectedLength: 0,
+		},
+		{
+			name: "single colleague",
+			secrets: map[string]string{
+				"OPENAI_KEY": "my-openai-key",
+			},
+			expectedLength: 1,
+		},
+		{
+			name: "multiple colleagues",
+			secrets: map[string]string{
+				"OPENAI_KEY": "my-openai-key",
+				"AWS_KEY":    "my-aws-key",
+			},
+			expectedLength: 2,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tempDir := t.TempDir()
+			testFile := filepath.Join(tempDir, "secrets.json")
+
+			s := &Store{path: testFile}
+			s.Secrets = tt.secrets
+
+			err := s.Save()
+
+			if err != nil {
+				t.Fatalf("expected not error got: %v", err)
+			}
+
+			// Verify file was created
+			if _, err := os.Stat(testFile); err != nil {
+				t.Fatalf("expected file to exist: %v", err)
+			}
+
+			// Verify content
+			data, err := os.ReadFile(testFile)
+			if err != nil {
+				t.Fatalf("failed to read file: %v", err)
+			}
+
+			var loaded Store
+			err = json.Unmarshal(data, &loaded)
+			if err != nil {
+				t.Fatalf("failed to unmarshal: %v", err)
+			}
+
+			if len(loaded.Secrets) != tt.expectedLength {
+				t.Errorf("expected %d colleagues, got %d", tt.expectedLength, len(loaded.Secrets))
+			}
+		})
+	}
+
+	t.Run("overwrites existing file", func(t *testing.T) {
+		tempDir := t.TempDir()
+		testFile := filepath.Join(tempDir, "secrets.json")
+
+		s := &Store{path: testFile, Secrets: map[string]string{}}
+		s.Set("OPENAI_KEY", "my-openai-key")
+
+		err := s.Save()
+
+		if err != nil {
+			t.Fatalf("expected not error got: %v", err)
+		}
+
+		// Verify file was created
+		if _, err := os.Stat(testFile); err != nil {
+			t.Fatalf("expected file to exist: %v", err)
+		}
+
+		// Verify content
+		data, err := os.ReadFile(testFile)
+		if err != nil {
+			t.Fatalf("failed to read file: %v", err)
+		}
+
+		var loaded Store
+		err = json.Unmarshal(data, &loaded)
+
+		if len(loaded.Secrets) != 1 {
+			t.Errorf("expected %d keys, got %d", 1, len(loaded.Secrets))
+		}
+
+		s.Set("AWS_KEY", "my-aws-key")
+
+		err = s.Save()
+
+		if err != nil {
+			t.Fatalf("expected not error got: %v", err)
+		}
+
+		data, err = os.ReadFile(testFile)
+		if err != nil {
+			t.Fatalf("failed to read file: %v", err)
+		}
+
+		err = json.Unmarshal(data, &loaded)
+
+		if len(loaded.Secrets) != 2 {
+			t.Errorf("expected %d keys, got %d", 2, len(loaded.Secrets))
+		}
+	})
 }
