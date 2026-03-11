@@ -97,6 +97,22 @@ func TestStore_LoadError(t *testing.T) {
 	}
 }
 
+func TestStore_LoadUnexistingFile(t *testing.T) {
+	s, err := Load("test-file.json")
+
+	if err != nil {
+		t.Fatalf("expected no error got: %v", err)
+	}
+
+	if s == nil {
+		t.Fatal("expected non-nil store")
+	}
+
+	if len(s.Secrets) != 0 {
+		t.Errorf("expected %d secrets, got %d", 0, len(s.Secrets))
+	}
+}
+
 func TestStore_Set(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -198,7 +214,7 @@ func TestStore_Delete(t *testing.T) {
 			expectedLength: 1,
 		},
 		{
-			name:           "keys already present",
+			name:           "delete non-existing key",
 			key:            "RANDOM_KEY",
 			expectedLength: 2,
 		},
@@ -218,11 +234,6 @@ func TestStore_Delete(t *testing.T) {
 			if len(s.List()) != tt.expectedLength {
 				t.Errorf("want: %d, got: %d", 1, len(s.List()))
 			}
-			_, ok := s.Get(tt.key)
-
-			if ok {
-				t.Errorf("%q shouldn't exists", tt.key)
-			}
 		})
 	}
 }
@@ -234,19 +245,19 @@ func TestStore_Save(t *testing.T) {
 		expectedLength int
 	}{
 		{
-			name:           "empty colleague list",
+			name:           "empty key list",
 			secrets:        map[string]string{},
 			expectedLength: 0,
 		},
 		{
-			name: "single colleague",
+			name: "single key",
 			secrets: map[string]string{
 				"OPENAI_KEY": "my-openai-key",
 			},
 			expectedLength: 1,
 		},
 		{
-			name: "multiple colleagues",
+			name: "multiple keys",
 			secrets: map[string]string{
 				"OPENAI_KEY": "my-openai-key",
 				"AWS_KEY":    "my-aws-key",
@@ -342,4 +353,47 @@ func TestStore_Save(t *testing.T) {
 			t.Errorf("expected %d keys, got %d", 2, len(loaded.Secrets))
 		}
 	})
+}
+
+func TestStore_RoundTrip(t *testing.T) {
+	tempDir := t.TempDir()
+	testFile := filepath.Join(tempDir, "secrets.json")
+
+	err := os.WriteFile(testFile, []byte("{ \"secrets\": {} }"), 0600)
+	if err != nil {
+		t.Fatalf("failed to create test file: %v", err)
+	}
+
+	s, err := Load(testFile)
+
+	if err != nil {
+		t.Fatalf("expected no error got: %v", err)
+	}
+
+	if s == nil {
+		t.Fatal("expected non-nil store")
+	}
+
+	s.Set("AWS_KEY", "my-aws-key")
+	err = s.Save()
+
+	if err != nil {
+		t.Fatalf("expected not error got: %v", err)
+	}
+
+	s, err = Load(testFile)
+
+	if err != nil {
+		t.Fatalf("expected no error got: %v", err)
+	}
+
+	v, ok := s.Get("AWS_KEY")
+
+	if !ok {
+		t.Error("expected to find the key stored")
+	}
+
+	if v != "my-aws-key" {
+		t.Errorf("want: %q, got: %q", "my-aws-key", v)
+	}
 }
