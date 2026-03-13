@@ -300,7 +300,7 @@ func TestStore_Save(t *testing.T) {
 		decrypted, err := crypto.Decrypt([]byte(testPassphrase), data)
 
 		if err != nil {
-			t.Fatalf("failed to encrypt file: %v", err)
+			t.Fatalf("failed to decrypt file: %v", err)
 		}
 
 		var loaded Store
@@ -325,7 +325,7 @@ func TestStore_Save(t *testing.T) {
 
 		decrypted, err = crypto.Decrypt([]byte(testPassphrase), data)
 		if err != nil {
-			t.Fatalf("failed to encrypt file: %v", err)
+			t.Fatalf("failed to decrypt file: %v", err)
 		}
 
 		err = json.Unmarshal(decrypted, &loaded)

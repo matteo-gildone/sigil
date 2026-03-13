@@ -129,7 +129,7 @@ Connect the crypto and store layers so the file on disk is always encrypted.
 - Test that loading with a wrong passphrase returns a clear error
 
 **Done when:** 
-- [ ] The store file on disk is encrypted. Tests pass.
+- [x] The store file on disk is encrypted. Tests pass.
 
 ---
 
