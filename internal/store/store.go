@@ -17,11 +17,12 @@ type Store struct {
 }
 
 func Load(path, passphrase string) (*Store, error) {
-	file, err := os.ReadFile(path)
+	filePath := filepath.Join(path, "store.enc")
+	file, err := os.ReadFile(filePath)
 
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return &Store{path: path, Secrets: map[string]string{}}, nil
+			return &Store{path: filePath, Secrets: map[string]string{}}, nil
 		}
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
@@ -32,7 +33,7 @@ func Load(path, passphrase string) (*Store, error) {
 	}
 
 	s := &Store{
-		path: path,
+		path: filePath,
 	}
 
 	if err := json.Unmarshal(data, s); err != nil {

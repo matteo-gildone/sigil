@@ -32,7 +32,7 @@ func TestStore_LoadError(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
-			testFile := filepath.Join(tempDir, "secrets.json")
+			testFile := filepath.Join(tempDir, "store.enc")
 			testPassphrase := "testpassphrase"
 
 			encrypted, err := crypto.Encrypt([]byte(testPassphrase), []byte(tt.fileContent))
@@ -46,7 +46,7 @@ func TestStore_LoadError(t *testing.T) {
 				t.Fatalf("failed to create test file: %v", err)
 			}
 
-			s, err := Load(testFile, testPassphrase)
+			s, err := Load(tempDir, testPassphrase)
 
 			if err == nil {
 				t.Fatalf("expected error, got nil")
@@ -61,7 +61,7 @@ func TestStore_LoadError(t *testing.T) {
 }
 
 func TestStore_LoadUnexistingFile(t *testing.T) {
-	s, err := Load("test-file.json", "passphrase")
+	s, err := Load("some-dir", "passphrase")
 
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
@@ -338,10 +338,9 @@ func TestStore_Save(t *testing.T) {
 
 func TestStore_RoundTrip(t *testing.T) {
 	tempDir := t.TempDir()
-	testFile := filepath.Join(tempDir, "secrets.json")
 	testPassphrase := "testpassphrase"
 
-	s, err := Load(testFile, testPassphrase)
+	s, err := Load(tempDir, testPassphrase)
 
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
@@ -358,7 +357,7 @@ func TestStore_RoundTrip(t *testing.T) {
 		t.Fatalf("expected not error got: %v", err)
 	}
 
-	s, err = Load(testFile, testPassphrase)
+	s, err = Load(tempDir, testPassphrase)
 
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
