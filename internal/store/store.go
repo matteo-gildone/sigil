@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+
+	"github.com/matteo-gildone/sigil/internal/crypto"
 )
 
 type Store struct {
@@ -14,7 +16,7 @@ type Store struct {
 	path    string
 }
 
-func Load(path string) (*Store, error) {
+func Load(path, passphrase string) (*Store, error) {
 	file, err := os.ReadFile(path)
 
 	if err != nil {
@@ -24,16 +26,23 @@ func Load(path string) (*Store, error) {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	s := &Store{path: path}
+	data, err := crypto.Decrypt([]byte(passphrase), file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decrypt file: %w", err)
+	}
 
-	if err := json.Unmarshal(file, s); err != nil {
+	s := &Store{
+		path: path,
+	}
+
+	if err := json.Unmarshal(data, s); err != nil {
 		return nil, fmt.Errorf("failed to parse JSON: %w", err)
 	}
 
 	return s, nil
 }
 
-func (s *Store) Save() error {
+func (s *Store) Save(passphrase string) error {
 	data, err := json.Marshal(s)
 	if err != nil {
 		return err

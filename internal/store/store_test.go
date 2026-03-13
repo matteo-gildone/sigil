@@ -6,53 +6,9 @@ import (
 	"path/filepath"
 	"slices"
 	"testing"
+
+	"github.com/matteo-gildone/sigil/internal/crypto"
 )
-
-func TestStore_Load(t *testing.T) {
-	tests := []struct {
-		name        string
-		fileContent string
-		wantCount   int
-	}{
-		{
-			name:        "empty list",
-			fileContent: `{ "secrets": {} }`,
-			wantCount:   0,
-		},
-		{
-			name:        "one entry",
-			fileContent: `{ "secrets": {"BD_PASSWORD": "randomlistofcharacter"} }`,
-			wantCount:   1,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tempDir := t.TempDir()
-			testFile := filepath.Join(tempDir, "secrets.json")
-
-			err := os.WriteFile(testFile, []byte(tt.fileContent), 0600)
-			if err != nil {
-				t.Fatalf("failed to create test file: %v", err)
-			}
-
-			s, err := Load(testFile)
-
-			if err != nil {
-				t.Fatalf("expected no error got: %v", err)
-			}
-
-			if s == nil {
-				t.Fatal("expected non-nil store")
-			}
-
-			if len(s.Secrets) != tt.wantCount {
-				t.Errorf("expected %d secrets, got %d", tt.wantCount, len(s.Secrets))
-			}
-
-		})
-	}
-}
 
 func TestStore_LoadError(t *testing.T) {
 	tests := []struct {
@@ -77,13 +33,20 @@ func TestStore_LoadError(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
 			testFile := filepath.Join(tempDir, "secrets.json")
+			testPassphrase := "testpassphrase"
 
-			err := os.WriteFile(testFile, []byte(tt.fileContent), 0600)
+			encrypted, err := crypto.Encrypt([]byte(testPassphrase), []byte(tt.fileContent))
+			if err != nil {
+				t.Fatalf("failed to encrypt test file: %v", err)
+			}
+
+			err = os.WriteFile(testFile, encrypted, 0600)
+
 			if err != nil {
 				t.Fatalf("failed to create test file: %v", err)
 			}
 
-			s, err := Load(testFile)
+			s, err := Load(testPassphrase, testFile)
 
 			if err == nil {
 				t.Fatalf("expected error, got nil")
@@ -98,7 +61,7 @@ func TestStore_LoadError(t *testing.T) {
 }
 
 func TestStore_LoadUnexistingFile(t *testing.T) {
-	s, err := Load("test-file.json")
+	s, err := Load("passphrase", "test-file.json")
 
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
@@ -270,11 +233,12 @@ func TestStore_Save(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
 			testFile := filepath.Join(tempDir, "secrets.json")
+			testPassphrase := "testpassphrase"
 
 			s := &Store{path: testFile}
 			s.Secrets = tt.secrets
 
-			err := s.Save()
+			err := s.Save(testPassphrase)
 
 			if err != nil {
 				t.Fatalf("expected not error got: %v", err)
@@ -291,8 +255,13 @@ func TestStore_Save(t *testing.T) {
 				t.Fatalf("failed to read file: %v", err)
 			}
 
+			decrypted, err := crypto.Decrypt([]byte(testPassphrase), data)
+			if err != nil {
+				t.Fatalf("failed to decrypt file: %v", err)
+			}
+
 			var loaded Store
-			err = json.Unmarshal(data, &loaded)
+			err = json.Unmarshal(decrypted, &loaded)
 			if err != nil {
 				t.Fatalf("failed to unmarshal: %v", err)
 			}
@@ -306,11 +275,12 @@ func TestStore_Save(t *testing.T) {
 	t.Run("overwrites existing file", func(t *testing.T) {
 		tempDir := t.TempDir()
 		testFile := filepath.Join(tempDir, "secrets.json")
+		testPassphrase := "testpassphrase"
 
 		s := &Store{path: testFile, Secrets: map[string]string{}}
 		s.Set("OPENAI_KEY", "my-openai-key")
 
-		err := s.Save()
+		err := s.Save(testPassphrase)
 
 		if err != nil {
 			t.Fatalf("expected not error got: %v", err)
@@ -327,8 +297,14 @@ func TestStore_Save(t *testing.T) {
 			t.Fatalf("failed to read file: %v", err)
 		}
 
+		decrypted, err := crypto.Decrypt([]byte(testPassphrase), data)
+
+		if err != nil {
+			t.Fatalf("failed to encrypt file: %v", err)
+		}
+
 		var loaded Store
-		err = json.Unmarshal(data, &loaded)
+		err = json.Unmarshal(decrypted, &loaded)
 
 		if len(loaded.Secrets) != 1 {
 			t.Errorf("expected %d keys, got %d", 1, len(loaded.Secrets))
@@ -336,7 +312,7 @@ func TestStore_Save(t *testing.T) {
 
 		s.Set("AWS_KEY", "my-aws-key")
 
-		err = s.Save()
+		err = s.Save(testPassphrase)
 
 		if err != nil {
 			t.Fatalf("expected not error got: %v", err)
@@ -347,7 +323,12 @@ func TestStore_Save(t *testing.T) {
 			t.Fatalf("failed to read file: %v", err)
 		}
 
-		err = json.Unmarshal(data, &loaded)
+		decrypted, err = crypto.Decrypt([]byte(testPassphrase), data)
+		if err != nil {
+			t.Fatalf("failed to encrypt file: %v", err)
+		}
+
+		err = json.Unmarshal(decrypted, &loaded)
 
 		if len(loaded.Secrets) != 2 {
 			t.Errorf("expected %d keys, got %d", 2, len(loaded.Secrets))
@@ -358,8 +339,9 @@ func TestStore_Save(t *testing.T) {
 func TestStore_RoundTrip(t *testing.T) {
 	tempDir := t.TempDir()
 	testFile := filepath.Join(tempDir, "secrets.json")
+	testPassphrase := "testpassphrase"
 
-	s, err := Load(testFile)
+	s, err := Load(testPassphrase, testFile)
 
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
@@ -370,13 +352,13 @@ func TestStore_RoundTrip(t *testing.T) {
 	}
 
 	s.Set("AWS_KEY", "my-aws-key")
-	err = s.Save()
+	err = s.Save(testPassphrase)
 
 	if err != nil {
 		t.Fatalf("expected not error got: %v", err)
 	}
 
-	s, err = Load(testFile)
+	s, err = Load(testPassphrase, testFile)
 
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)

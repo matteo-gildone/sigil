@@ -42,7 +42,7 @@ func TestDecrypt(t *testing.T) {
 	}
 }
 
-func TestRoundtrip(t *testing.T) {
+func TestRoundTrip(t *testing.T) {
 	passphrase := "passphrase"
 	plaintext := "plaintext"
 	encrypted, err := Encrypt([]byte(passphrase), []byte(plaintext))
