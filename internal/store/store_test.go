@@ -46,7 +46,7 @@ func TestStore_LoadError(t *testing.T) {
 				t.Fatalf("failed to create test file: %v", err)
 			}
 
-			s, err := Load(testPassphrase, testFile)
+			s, err := Load(testFile, testPassphrase)
 
 			if err == nil {
 				t.Fatalf("expected error, got nil")
@@ -61,7 +61,7 @@ func TestStore_LoadError(t *testing.T) {
 }
 
 func TestStore_LoadUnexistingFile(t *testing.T) {
-	s, err := Load("passphrase", "test-file.json")
+	s, err := Load("test-file.json", "passphrase")
 
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
@@ -341,7 +341,7 @@ func TestStore_RoundTrip(t *testing.T) {
 	testFile := filepath.Join(tempDir, "secrets.json")
 	testPassphrase := "testpassphrase"
 
-	s, err := Load(testPassphrase, testFile)
+	s, err := Load(testFile, testPassphrase)
 
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
@@ -358,7 +358,7 @@ func TestStore_RoundTrip(t *testing.T) {
 		t.Fatalf("expected not error got: %v", err)
 	}
 
-	s, err = Load(testPassphrase, testFile)
+	s, err = Load(testFile, testPassphrase)
 
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)

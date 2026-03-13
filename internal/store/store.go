@@ -48,6 +48,11 @@ func (s *Store) Save(passphrase string) error {
 		return err
 	}
 
+	encrypted, err := crypto.Encrypt([]byte(passphrase), data)
+	if err != nil {
+		return err
+	}
+
 	tmp, err := os.CreateTemp(filepath.Dir(s.path), ".sigil-*.tmp")
 	if err != nil {
 		return err
@@ -55,7 +60,7 @@ func (s *Store) Save(passphrase string) error {
 
 	defer os.Remove(tmp.Name())
 
-	if _, err := tmp.Write(data); err != nil {
+	if _, err := tmp.Write(encrypted); err != nil {
 		return err
 	}
 
