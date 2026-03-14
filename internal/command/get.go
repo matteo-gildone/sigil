@@ -21,6 +21,10 @@ func runGet(args []string) error {
 	project := getSubcommand.String("project", "default", "project namespace")
 	getSubcommand.Parse(args)
 
+	if getSubcommand.NArg() < 1 {
+		return fmt.Errorf("usage: %s", GetCmd.Usage)
+	}
+
 	passphrase, err := cli.PromptPassphrase("passphrase:", int(os.Stdin.Fd()))
 	if err != nil {
 		return fmt.Errorf("failed to read passphrase: %w", err)
@@ -36,9 +40,10 @@ func runGet(args []string) error {
 		return fmt.Errorf("failed to load store: %w", err)
 	}
 
-	k, v := s.Get(getSubcommand.Arg(0))
-	if v {
-		fmt.Println(k)
+	value, ok := s.Get(getSubcommand.Arg(0))
+	if !ok {
+		return fmt.Errorf("key %q not found", getSubcommand.Arg(0))
 	}
+	fmt.Println(value)
 	return nil
 }

@@ -21,6 +21,10 @@ func runSet(args []string) error {
 	project := setSubcommand.String("project", "default", "project namespace")
 	setSubcommand.Parse(args)
 
+	if setSubcommand.NArg() < 2 {
+		return fmt.Errorf("usage: %s", SetCmd.Usage)
+	}
+
 	passphrase, err := cli.PromptPassphrase("passphrase:", int(os.Stdin.Fd()))
 	if err != nil {
 		return fmt.Errorf("failed to read passphrase: %w", err)
