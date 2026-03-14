@@ -45,6 +45,6 @@ func runSet(args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to save store: %w", err)
 	}
-	fmt.Printf("save %q successfully", setSubcommand.Arg(0))
+	fmt.Printf("saved %q successfully", setSubcommand.Arg(0))
 	return nil
 }
