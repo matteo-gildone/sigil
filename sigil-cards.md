@@ -144,7 +144,7 @@ Wire the first two real commands end to end.
 - Print a clear error if the wrong passphrase is given
 
 **Done when:** 
-- [ ] You can `sigil set DB_URL "postgres://..."` and then `sigil get DB_URL` and get the value back.
+- [x] You can `sigil set DB_URL "postgres://..."` and then `sigil get DB_URL` and get the value back.
 
 ---
 

@@ -22,7 +22,7 @@ func runGet(args []string) error {
 	getSubcommand.Parse(args)
 
 	if getSubcommand.NArg() < 1 {
-		return fmt.Errorf("usage: %s", GetCmd.Usage)
+		return fmt.Errorf("usage: sigil GET KEY [-project]")
 	}
 
 	passphrase, err := cli.PromptPassphrase("passphrase:", int(os.Stdin.Fd()))

@@ -22,7 +22,7 @@ func runSet(args []string) error {
 	setSubcommand.Parse(args)
 
 	if setSubcommand.NArg() < 2 {
-		return fmt.Errorf("usage: %s", SetCmd.Usage)
+		return fmt.Errorf("usage: sigil set KEY VALUE [-project]")
 	}
 
 	passphrase, err := cli.PromptPassphrase("passphrase:", int(os.Stdin.Fd()))
@@ -45,6 +45,6 @@ func runSet(args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to save store: %w", err)
 	}
-	fmt.Printf("saved %q successfully", setSubcommand.Arg(0))
+	fmt.Printf("saved %q successfully\n", setSubcommand.Arg(0))
 	return nil
 }
