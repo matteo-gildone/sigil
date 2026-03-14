@@ -46,33 +46,39 @@ func Load(path, passphrase string) (*Store, error) {
 func (s *Store) Save(passphrase string) error {
 	data, err := json.Marshal(s)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to marshal store: %w", err)
 	}
 
 	encrypted, err := crypto.Encrypt([]byte(passphrase), data)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to encrypt data: %w", err)
 	}
 
 	tmp, err := os.CreateTemp(filepath.Dir(s.path), ".sigil-*.tmp")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to create temp file: %w", err)
 	}
 
-	defer os.Remove(tmp.Name())
+	removeTemp := true
+	defer func() {
+		if removeTemp {
+			os.Remove(tmp.Name())
+		}
+	}()
 
 	if _, err := tmp.Write(encrypted); err != nil {
-		return err
+		return fmt.Errorf("failed to write file: %w", err)
 	}
 
 	if err := tmp.Sync(); err != nil {
-		return err
+		return fmt.Errorf("failed to sync file: %w", err)
 	}
 
 	if err := tmp.Close(); err != nil {
-		return err
+		return fmt.Errorf("failed to close file: %w", err)
 	}
 
+	removeTemp = false
 	return os.Rename(tmp.Name(), s.path)
 }
 
