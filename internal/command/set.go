@@ -3,6 +3,7 @@ package command
 import (
 	"flag"
 	"fmt"
+	"os"
 )
 
 var SetCmd = &Command{
@@ -30,6 +31,6 @@ func runSet(args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to save store: %w", err)
 	}
-	fmt.Printf("saved %q successfully\n", setSubcommand.Arg(0))
+	fmt.Fprintf(os.Stdout, "saved %q successfully\n", setSubcommand.Arg(0))
 	return nil
 }

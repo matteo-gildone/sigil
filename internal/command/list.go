@@ -26,12 +26,13 @@ func runList(args []string) error {
 	}
 
 	if term.IsTerminal(int(os.Stdout.Fd())) {
-		fmt.Fprintf(os.Stdout, "Secrets \u00B7 %s\n", *project)
-		fmt.Fprintln(os.Stdout, strings.Repeat("\u2500", 20))
+		header := fmt.Sprintf("Secrets \u00B7 %s", *project)
+		fmt.Fprintln(os.Stdout, header)
+		fmt.Fprintln(os.Stdout, strings.Repeat("\u2500", len(header)))
 	}
 
 	for _, key := range s.List() {
-		fmt.Println(key)
+		fmt.Fprintln(os.Stdout, key)
 	}
 
 	return nil

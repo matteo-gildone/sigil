@@ -3,6 +3,7 @@ package command
 import (
 	"flag"
 	"fmt"
+	"os"
 )
 
 var DeleteCmd = &Command{
@@ -36,7 +37,7 @@ func runDelete(args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to save store: %w", err)
 	}
-	fmt.Printf("deleted %q successfully\n", deleteSubcommand.Arg(0))
+	fmt.Fprintf(os.Stdout, "deleted %q successfully\n", deleteSubcommand.Arg(0))
 
 	return nil
 }

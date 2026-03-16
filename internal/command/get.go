@@ -3,6 +3,7 @@ package command
 import (
 	"flag"
 	"fmt"
+	"os"
 )
 
 var GetCmd = &Command{
@@ -29,6 +30,6 @@ func runGet(args []string) error {
 	if !ok {
 		return fmt.Errorf("key %q not found", getSubcommand.Arg(0))
 	}
-	fmt.Println(value)
+	fmt.Fprintln(os.Stdout, value)
 	return nil
 }
