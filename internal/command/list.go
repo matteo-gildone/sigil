@@ -4,10 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
-	"github.com/matteo-gildone/sigil/internal/cli"
-	"github.com/matteo-gildone/sigil/internal/store"
-	"github.com/matteo-gildone/sigil/internal/xdg"
+	"golang.org/x/term"
 )
 
 var ListCmd = &Command{
@@ -21,23 +20,16 @@ func runList(args []string) error {
 	project := listSubcommand.String("project", "default", "project namespace")
 	listSubcommand.Parse(args)
 
-	passphrase, err := cli.PromptPassphrase("passphrase:", int(os.Stdin.Fd()))
+	s, _, err := loadStore(*project)
 	if err != nil {
-		return fmt.Errorf("failed to read passphrase: %w", err)
+		return err
 	}
 
-	path, err := xdg.ProjectPath(*project)
-	if err != nil {
-		return fmt.Errorf("failed to read project path: %w", err)
+	if term.IsTerminal(int(os.Stdout.Fd())) {
+		fmt.Fprintf(os.Stdout, "Secrets \u00B7 %s\n", *project)
+		fmt.Fprintln(os.Stdout, strings.Repeat("\u2500", 20))
 	}
 
-	s, err := store.Load(path, string(passphrase))
-	if err != nil {
-		return fmt.Errorf("failed to load store: %w", err)
-	}
-
-	fmt.Fprintln(os.Stderr, "Secrets:")
-	fmt.Fprintln(os.Stderr, "-------------------------------")
 	for _, key := range s.List() {
 		fmt.Println(key)
 	}
