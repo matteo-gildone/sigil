@@ -157,7 +157,7 @@ Wire the first two real commands end to end.
 - Print a clear error if the key doesn't exist
 
 **Done when:** 
-- [ ] All four commands work end to end.
+- [x] All four commands work end to end.
 
 ---
 
