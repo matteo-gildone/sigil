@@ -53,7 +53,10 @@ func runClip(args []string) error {
 			time.Sleep(time.Duration(*clipClear) * time.Second)
 			cmd := exec.Command("pbcopy")
 			cmd.Stdin = strings.NewReader("")
-			err = cmd.Run()
+			if err := cmd.Run(); err != nil {
+				fmt.Fprintf(os.Stderr, "failed to clear clipboard: \n", *clipClear)
+			}
+
 		}()
 
 		wg.Wait()
