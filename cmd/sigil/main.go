@@ -13,7 +13,6 @@ var commands = []*command.Command{
 	command.ListCmd,
 	command.DeleteCmd,
 	command.ExecCmd,
-	command.ClipCmd,
 }
 
 func main() {

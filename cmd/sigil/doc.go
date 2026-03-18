@@ -7,11 +7,12 @@
 //
 // Usage:
 //
-//	sigil set KEY VALUE [-project name]
-//	sigil get KEY [-project name]
-//	sigil list [-project name]
-//	sigil delete KEY [-project name]
-//	sigil exec [-project name] -- command [args...]
+//	sigil set    [-project] KEY VALUE
+//	sigil get    [-project] KEY
+//	sigil list   [-project]
+//	sigil delete [-project] KEY
+//	sigil clip   [-project] [-clear 15]KEY
+//	sigil exec   [-project] -- command [args...]
 //
 // Secrets are encrypted with AES-256-GCM, keyed from a passphrase via
 // PBKDF2-SHA256. The store file on disk is never readable as plain text.

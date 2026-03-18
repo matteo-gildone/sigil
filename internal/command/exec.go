@@ -13,6 +13,8 @@ var ExecCmd = &Command{
 
 func runExec(args []string) error {
 	execSubcommand := flag.NewFlagSet("exec", flag.ExitOnError)
+	var keys multiFlag
+	execSubcommand.Var(&keys, "key", "secret key to inject (repeatable)")
 	project := execSubcommand.String("project", "default", "project namespace")
 	execSubcommand.Parse(args)
 

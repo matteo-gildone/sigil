@@ -17,8 +17,8 @@ func runSet(args []string) error {
 	project := setSubcommand.String("project", "default", "project namespace")
 	setSubcommand.Parse(args)
 
-	if setSubcommand.NArg() < 2 {
-		return fmt.Errorf("usage: sigil set [-project] KEY VALUE")
+	if setSubcommand.NArg() < 1 {
+		return fmt.Errorf("usage: sigil set [-project] KEY")
 	}
 
 	s, passphrase, err := loadStore(*project)
@@ -26,7 +26,12 @@ func runSet(args []string) error {
 		return err
 	}
 
-	s.Set(setSubcommand.Arg(0), setSubcommand.Arg(1))
+	password, err := getPassword()
+	if err != nil {
+		return err
+	}
+
+	s.Set(setSubcommand.Arg(0), string(password))
 	err = s.Save(string(passphrase))
 	if err != nil {
 		return fmt.Errorf("failed to save store: %w", err)
