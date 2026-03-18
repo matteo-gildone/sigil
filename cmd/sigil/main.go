@@ -13,6 +13,7 @@ var commands = []*command.Command{
 	command.ListCmd,
 	command.DeleteCmd,
 	command.ExecCmd,
+	command.ClipCmd,
 }
 
 func main() {
@@ -25,7 +26,7 @@ func main() {
 		if cmd.Name == os.Args[1] {
 			err := cmd.Run(os.Args[2:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%q failed: %v", cmd.Name, err)
+				fmt.Fprintf(os.Stderr, "%q failed: %v\n", cmd.Name, err)
 				os.Exit(1)
 			}
 			return
