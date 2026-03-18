@@ -12,7 +12,7 @@ import (
 
 var ClipCmd = &Command{
 	Name:  "clip",
-	Usage: "sigil clip -- <command> [args...]",
+	Usage: "sigil clip [-project] [-clear 15] KEY",
 	Run:   runClip,
 }
 
@@ -47,12 +47,14 @@ func runClip(args []string) error {
 	if *clipClear > 0 {
 		fmt.Fprintf(os.Stdout, "clearing clipboard in %d seconds\n", *clipClear)
 		var wg sync.WaitGroup
-		wg.Go(func() {
-			time.Sleep(time.Second)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			time.Sleep(time.Duration(*clipClear) * time.Second)
 			cmd := exec.Command("pbcopy")
 			cmd.Stdin = strings.NewReader("")
 			err = cmd.Run()
-		})
+		}()
 
 		wg.Wait()
 		fmt.Fprintln(os.Stdout, "clipboard cleared")
