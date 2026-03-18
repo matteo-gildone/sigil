@@ -18,7 +18,7 @@ func runDelete(args []string) error {
 	deleteSubcommand.Parse(args)
 
 	if deleteSubcommand.NArg() < 1 {
-		return fmt.Errorf("usage: sigil delete KEY [-project]")
+		return fmt.Errorf("usage: sigil delete [-project] KEY")
 	}
 
 	s, passphrase, err := loadStore(*project)

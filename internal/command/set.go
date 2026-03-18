@@ -18,7 +18,7 @@ func runSet(args []string) error {
 	setSubcommand.Parse(args)
 
 	if setSubcommand.NArg() < 2 {
-		return fmt.Errorf("usage: sigil set KEY VALUE [-project]")
+		return fmt.Errorf("usage: sigil set [-project] KEY VALUE")
 	}
 
 	s, passphrase, err := loadStore(*project)

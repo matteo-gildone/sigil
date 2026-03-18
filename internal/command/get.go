@@ -18,7 +18,7 @@ func runGet(args []string) error {
 	getSubcommand.Parse(args)
 
 	if getSubcommand.NArg() < 1 {
-		return fmt.Errorf("usage: sigil GET KEY [-project]")
+		return fmt.Errorf("usage: sigil get [-project] KEY")
 	}
 
 	s, _, err := loadStore(*project)
