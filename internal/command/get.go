@@ -54,7 +54,7 @@ func runGet(args []string) error {
 			cmd := exec.Command("pbcopy")
 			cmd.Stdin = strings.NewReader("")
 			if err := cmd.Run(); err != nil {
-				fmt.Fprintf(os.Stderr, "failed to clear clipboard: \n", *clipClear)
+				fmt.Fprintln(os.Stderr, "failed to clear clipboard")
 			}
 
 		}()
