@@ -56,7 +56,6 @@ func runGet(args []string) error {
 			if err := cmd.Run(); err != nil {
 				fmt.Fprintln(os.Stderr, "failed to clear clipboard")
 			}
-
 		}()
 
 		wg.Wait()

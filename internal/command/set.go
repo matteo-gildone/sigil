@@ -8,7 +8,7 @@ import (
 
 var SetCmd = &Command{
 	Name:  "set",
-	Usage: "sigil set KEY VALUE [-project-name]",
+	Usage: "sigil set KEY [-project-name]",
 	Run:   runSet,
 }
 
@@ -26,7 +26,7 @@ func runSet(args []string) error {
 		return err
 	}
 
-	password, err := getPassword()
+	password, err := prompt("password:")
 	if err != nil {
 		return err
 	}

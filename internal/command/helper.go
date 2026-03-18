@@ -22,7 +22,7 @@ func (f *multiFlag) Set(value string) error {
 }
 
 func loadStore(project string) (*store.Store, []byte, error) {
-	passphrase, err := cli.PromptPassphrase("passphrase:", int(os.Stdin.Fd()))
+	passphrase, err := prompt("passphrase:")
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read passphrase: %w", err)
 	}
@@ -40,10 +40,10 @@ func loadStore(project string) (*store.Store, []byte, error) {
 	return s, passphrase, nil
 }
 
-func getPassword() ([]byte, error) {
-	password, err := cli.PromptPassphrase("password:", int(os.Stdin.Fd()))
+func prompt(label string) ([]byte, error) {
+	p, err := cli.PromptPassphrase(label, int(os.Stdin.Fd()))
 	if err != nil {
-		return nil, fmt.Errorf("failed to read password: %w", err)
+		return nil, fmt.Errorf("failed to read %s: %w", strings.TrimSuffix(label, ":"), err)
 	}
-	return password, nil
+	return p, nil
 }
