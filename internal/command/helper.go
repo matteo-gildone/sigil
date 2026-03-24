@@ -3,7 +3,6 @@ package command
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 	"sync"
 	"time"
@@ -12,17 +11,6 @@ import (
 	"github.com/matteo-gildone/sigil/internal/store"
 	"github.com/matteo-gildone/sigil/internal/xdg"
 )
-
-type multiFlag []string
-
-func (f *multiFlag) String() string {
-	return strings.Join(*f, ", ")
-}
-
-func (f *multiFlag) Set(value string) error {
-	*f = append(*f, value)
-	return nil
-}
 
 func loadStore(project string) (*store.Store, []byte, error) {
 	passphrase, err := prompt("passphrase:")
@@ -52,7 +40,7 @@ func prompt(label string) ([]byte, error) {
 }
 
 func copyToClipboard(value, key string, clearAfter int) error {
-	cmd := exec.Command("pbcopy")
+	cmd := clipboardCommand()
 	cmd.Stdin = strings.NewReader(value)
 
 	if err := cmd.Run(); err != nil {
@@ -66,7 +54,7 @@ func copyToClipboard(value, key string, clearAfter int) error {
 		go func() {
 			defer wg.Done()
 			time.Sleep(time.Duration(clearAfter) * time.Second)
-			cmd := exec.Command("pbcopy")
+			cmd := clipboardCommand()
 			cmd.Stdin = strings.NewReader("")
 			if err := cmd.Run(); err != nil {
 				fmt.Fprintln(os.Stderr, "failed to clear clipboard")

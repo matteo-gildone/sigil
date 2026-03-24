@@ -26,7 +26,7 @@ func runSet(args []string) error {
 		return err
 	}
 
-	password, err := prompt("password:")
+	password, err := prompt("secret:")
 	if err != nil {
 		return err
 	}
