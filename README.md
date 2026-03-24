@@ -6,7 +6,6 @@ Store credentials locally and inject them directly into any process — without 
 
 ```bash
 sigil set DB_URL "postgres://localhost/myapp"
-sigil exec -- go run main.go
 ```
 
 ## Why

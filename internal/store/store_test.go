@@ -232,7 +232,7 @@ func TestStore_Save(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
-			testFile := filepath.Join(tempDir, "secrets.json")
+			testFile := filepath.Join(tempDir, "store.enc")
 			testPassphrase := "testpassphrase"
 
 			s := &Store{path: testFile}
@@ -274,7 +274,7 @@ func TestStore_Save(t *testing.T) {
 
 	t.Run("overwrites existing file", func(t *testing.T) {
 		tempDir := t.TempDir()
-		testFile := filepath.Join(tempDir, "secrets.json")
+		testFile := filepath.Join(tempDir, "store.enc")
 		testPassphrase := "testpassphrase"
 
 		s := &Store{path: testFile, Secrets: map[string]string{}}

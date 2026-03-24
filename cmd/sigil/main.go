@@ -12,7 +12,6 @@ var commands = []*command.Command{
 	command.GetCmd,
 	command.ListCmd,
 	command.DeleteCmd,
-	command.ExecCmd,
 }
 
 func main() {
@@ -41,5 +40,4 @@ func usage() {
 	for _, cmd := range commands {
 		fmt.Fprintf(os.Stderr, "  %s: %s\n", cmd.Name, cmd.Usage)
 	}
-	os.Exit(1)
 }

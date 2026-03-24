@@ -29,7 +29,7 @@ func runDelete(args []string) error {
 	_, ok := s.Get(deleteSubcommand.Arg(0))
 
 	if !ok {
-		return fmt.Errorf("key %q does not exist", deleteSubcommand.Arg(0))
+		return fmt.Errorf("key %q not found", deleteSubcommand.Arg(0))
 	}
 
 	s.Delete(deleteSubcommand.Arg(0))

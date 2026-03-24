@@ -3,11 +3,6 @@ package command
 import (
 	"flag"
 	"fmt"
-	"os"
-	"os/exec"
-	"strings"
-	"sync"
-	"time"
 )
 
 var GetCmd = &Command{
@@ -36,31 +31,5 @@ func runGet(args []string) error {
 		return fmt.Errorf("key %q not found", getSubcommand.Arg(0))
 	}
 
-	cmd := exec.Command("pbcopy")
-	cmd.Stdin = strings.NewReader(value)
-	err = cmd.Run()
-	if err != nil {
-		return err
-	}
-	fmt.Fprintf(os.Stdout, "%q copied to clipboard\n", getSubcommand.Arg(0))
-
-	if *clipClear > 0 {
-		fmt.Fprintf(os.Stdout, " clearing clipboard in %d seconds\n", *clipClear)
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			time.Sleep(time.Duration(*clipClear) * time.Second)
-			cmd := exec.Command("pbcopy")
-			cmd.Stdin = strings.NewReader("")
-			if err := cmd.Run(); err != nil {
-				fmt.Fprintln(os.Stderr, "failed to clear clipboard")
-			}
-		}()
-
-		wg.Wait()
-		fmt.Fprintln(os.Stdout, "clipboard cleared")
-	}
-
-	return nil
+	return copyToClipboard(value, getSubcommand.Arg(0), *clipClear)
 }
