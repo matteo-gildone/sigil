@@ -3,10 +3,7 @@ package command
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/matteo-gildone/sigil/internal/cli"
 	"github.com/matteo-gildone/sigil/internal/store"
@@ -44,37 +41,4 @@ func prompt(label string) ([]byte, error) {
 		return nil, fmt.Errorf("failed to read %s: %w", strings.TrimSuffix(label, ":"), err)
 	}
 	return p, nil
-}
-
-func clipboardCommand(tool string) *exec.Cmd {
-	args := strings.Fields(tool)
-	return exec.Command(args[0], args[1:]...)
-}
-
-func copyToClipboard(tool, value, key string, clearAfter int) error {
-	cmd := clipboardCommand(tool)
-	cmd.Stdin = strings.NewReader(value)
-
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to copy to clipboard: %w", err)
-	}
-	fmt.Fprintf(os.Stdout, "%q copied to clipboard\n", key)
-	if clearAfter > 0 {
-		fmt.Fprintf(os.Stdout, "clearing clipboard in %d seconds\n", clearAfter)
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			time.Sleep(time.Duration(clearAfter) * time.Second)
-			cmd := clipboardCommand(tool)
-			cmd.Stdin = strings.NewReader("")
-			if err := cmd.Run(); err != nil {
-				fmt.Fprintln(os.Stderr, "failed to clear clipboard")
-			}
-		}()
-
-		wg.Wait()
-		fmt.Fprintln(os.Stdout, "clipboard cleared")
-	}
-	return nil
 }

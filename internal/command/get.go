@@ -39,6 +39,8 @@ func runGet(args []string) error {
 		if !ok {
 			return fmt.Errorf("key %q not found", getSubcommand.Arg(0))
 		}
-		return copyToClipboard(tool, value, getSubcommand.Arg(0), *clipClear)
+
+		writer := &execWriter{tool: tool}
+		return copyToClipboard(writer, getSubcommand.Arg(0), value, *clipClear)
 	})
 }
