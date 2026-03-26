@@ -21,16 +21,17 @@ func runGet(args []string) error {
 	clip := getSubcommand.String("clip", "", "copy to clipboard command")
 	getSubcommand.Parse(args)
 	tool := *clip
+
+	if getSubcommand.NArg() < 1 {
+		return fmt.Errorf("usage: sigil get [-project] [-clip] [-clear 15] KEY")
+	}
+
 	if tool == "" {
 		tool = os.Getenv("SIGIL_CLIPBOARD")
 	}
 
 	if tool == "" {
 		return fmt.Errorf("no clipboard tool configured: set SIGIL_CLIPBOARD or use -clip flag")
-	}
-
-	if getSubcommand.NArg() < 1 {
-		return fmt.Errorf("usage: sigil get [-project] [-clip] [-clear 15] KEY")
 	}
 
 	return withStore(*project, func(s *store.Store, passphrase []byte) error {

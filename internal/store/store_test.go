@@ -15,6 +15,8 @@ func TestStore_LoadError(t *testing.T) {
 		name        string
 		fileContent string
 	}{
+		// empty plaintext encrypts and decrypts successfully - this test
+		// the json.Unmarshal error path, not truncated or corrupt ciphertext
 		{
 			name:        "empty file",
 			fileContent: "",
@@ -35,7 +37,7 @@ func TestStore_LoadError(t *testing.T) {
 			testFile := filepath.Join(tempDir, "store.enc")
 			testPassphrase := []byte("testpassphrase")
 
-			encrypted, err := crypto.Encrypt([]byte(testPassphrase), []byte(tt.fileContent))
+			encrypted, err := crypto.Encrypt(testPassphrase, []byte(tt.fileContent))
 			if err != nil {
 				t.Fatalf("failed to encrypt test file: %v", err)
 			}

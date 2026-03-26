@@ -28,13 +28,6 @@ func runSet(args []string) error {
 		if err != nil {
 			return err
 		}
-
-		s.Set(setSubcommand.Arg(0), password)
-		err = s.Save(passphrase)
-		if err != nil {
-			return fmt.Errorf("failed to save store: %w", err)
-		}
-
 		// zero sensitive bytes after use; string convention inside Set means the value copy inside the store map
 		// can't be zeroed - known limitation
 		defer func() {
@@ -42,6 +35,13 @@ func runSet(args []string) error {
 				password[i] = 0
 			}
 		}()
+
+		s.Set(setSubcommand.Arg(0), password)
+		err = s.Save(passphrase)
+		if err != nil {
+			return fmt.Errorf("failed to save store: %w", err)
+		}
+
 		fmt.Fprintf(os.Stdout, "saved %q successfully\n", setSubcommand.Arg(0))
 		return nil
 	})
