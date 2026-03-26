@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"time"
@@ -23,7 +24,7 @@ func loadStore(project string) (*store.Store, []byte, error) {
 		return nil, nil, fmt.Errorf("failed to read project path: %w", err)
 	}
 
-	s, err := store.Load(path, string(passphrase))
+	s, err := store.Load(path, passphrase)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to load store: %w", err)
 	}
@@ -39,8 +40,14 @@ func prompt(label string) ([]byte, error) {
 	return p, nil
 }
 
-func copyToClipboard(value, key string, clearAfter int) error {
-	cmd := clipboardCommand()
+func clipboardCommand(tool string) *exec.Cmd {
+	args := strings.Fields(tool)
+	return exec.Command(args[0], args[1:]...)
+}
+
+func copyToClipboard(tool, value, key string, clearAfter int) error {
+
+	cmd := clipboardCommand(tool)
 	cmd.Stdin = strings.NewReader(value)
 
 	if err := cmd.Run(); err != nil {
@@ -54,7 +61,7 @@ func copyToClipboard(value, key string, clearAfter int) error {
 		go func() {
 			defer wg.Done()
 			time.Sleep(time.Duration(clearAfter) * time.Second)
-			cmd := clipboardCommand()
+			cmd := clipboardCommand(tool)
 			cmd.Stdin = strings.NewReader("")
 			if err := cmd.Run(); err != nil {
 				fmt.Fprintln(os.Stderr, "failed to clear clipboard")

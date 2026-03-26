@@ -33,10 +33,17 @@ func runDelete(args []string) error {
 	}
 
 	s.Delete(deleteSubcommand.Arg(0))
-	err = s.Save(string(passphrase))
+	err = s.Save(passphrase)
 	if err != nil {
 		return fmt.Errorf("failed to save store: %w", err)
 	}
+
+	defer func() {
+		for i := range passphrase {
+			passphrase[i] = 0
+		}
+	}()
+
 	fmt.Fprintf(os.Stdout, "deleted %q successfully\n", deleteSubcommand.Arg(0))
 
 	return nil

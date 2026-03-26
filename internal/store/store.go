@@ -16,7 +16,7 @@ type Store struct {
 	path    string
 }
 
-func Load(path, passphrase string) (*Store, error) {
+func Load(path string, passphrase []byte) (*Store, error) {
 	filePath := filepath.Join(path, "store.enc")
 	file, err := os.ReadFile(filePath)
 
@@ -43,7 +43,7 @@ func Load(path, passphrase string) (*Store, error) {
 	return s, nil
 }
 
-func (s *Store) Save(passphrase string) error {
+func (s *Store) Save(passphrase []byte) error {
 	data, err := json.Marshal(s)
 	if err != nil {
 		return fmt.Errorf("failed to marshal store: %w", err)

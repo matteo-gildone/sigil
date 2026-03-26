@@ -20,10 +20,16 @@ func runList(args []string) error {
 	project := listSubcommand.String("project", "default", "project namespace")
 	listSubcommand.Parse(args)
 
-	s, _, err := loadStore(*project)
+	s, passphrase, err := loadStore(*project)
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		for i := range passphrase {
+			passphrase[i] = 0
+		}
+	}()
 
 	if term.IsTerminal(int(os.Stdout.Fd())) {
 		header := fmt.Sprintf("Secrets \u00B7 %s", *project)

@@ -32,10 +32,21 @@ func runSet(args []string) error {
 	}
 
 	s.Set(setSubcommand.Arg(0), string(password))
-	err = s.Save(string(passphrase))
+	err = s.Save(passphrase)
 	if err != nil {
 		return fmt.Errorf("failed to save store: %w", err)
 	}
+
+	defer func() {
+		for i := range passphrase {
+			passphrase[i] = 0
+		}
+
+		for i := range password {
+			password[i] = 0
+		}
+	}()
+
 	fmt.Fprintf(os.Stdout, "saved %q successfully\n", setSubcommand.Arg(0))
 	return nil
 }
