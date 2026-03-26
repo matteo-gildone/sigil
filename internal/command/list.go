@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/matteo-gildone/sigil/internal/store"
 	"golang.org/x/term"
 )
 
@@ -20,26 +21,16 @@ func runList(args []string) error {
 	project := listSubcommand.String("project", "default", "project namespace")
 	listSubcommand.Parse(args)
 
-	s, passphrase, err := loadStore(*project)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		for i := range passphrase {
-			passphrase[i] = 0
+	return withStore(*project, func(s *store.Store, passphrase []byte) error {
+		if term.IsTerminal(int(os.Stdout.Fd())) {
+			header := fmt.Sprintf("Secrets \u00B7 %s", *project)
+			fmt.Fprintln(os.Stdout, header)
+			fmt.Fprintln(os.Stdout, strings.Repeat("\u2500", len(header)))
 		}
-	}()
 
-	if term.IsTerminal(int(os.Stdout.Fd())) {
-		header := fmt.Sprintf("Secrets \u00B7 %s", *project)
-		fmt.Fprintln(os.Stdout, header)
-		fmt.Fprintln(os.Stdout, strings.Repeat("\u2500", len(header)))
-	}
-
-	for _, key := range s.List() {
-		fmt.Fprintln(os.Stdout, key)
-	}
-
-	return nil
+		for _, key := range s.List() {
+			fmt.Fprintln(os.Stdout, key)
+		}
+		return nil
+	})
 }

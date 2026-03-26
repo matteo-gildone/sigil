@@ -27,7 +27,7 @@ func Load(path string, passphrase []byte) (*Store, error) {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	data, err := crypto.Decrypt([]byte(passphrase), file)
+	data, err := crypto.Decrypt(passphrase, file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decrypt file: %w", err)
 	}
@@ -49,7 +49,7 @@ func (s *Store) Save(passphrase []byte) error {
 		return fmt.Errorf("failed to marshal store: %w", err)
 	}
 
-	encrypted, err := crypto.Encrypt([]byte(passphrase), data)
+	encrypted, err := crypto.Encrypt(passphrase, data)
 	if err != nil {
 		return fmt.Errorf("failed to encrypt data: %w", err)
 	}
@@ -82,8 +82,8 @@ func (s *Store) Save(passphrase []byte) error {
 	return os.Rename(tmp.Name(), s.path)
 }
 
-func (s *Store) Set(key, value string) {
-	s.Secrets[key] = value
+func (s *Store) Set(key string, value []byte) {
+	s.Secrets[key] = string(value)
 }
 
 func (s *Store) Get(key string) (string, bool) {

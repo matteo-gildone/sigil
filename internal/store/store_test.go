@@ -33,7 +33,7 @@ func TestStore_LoadError(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
 			testFile := filepath.Join(tempDir, "store.enc")
-			testPassphrase := "testpassphrase"
+			testPassphrase := []byte("testpassphrase")
 
 			encrypted, err := crypto.Encrypt([]byte(testPassphrase), []byte(tt.fileContent))
 			if err != nil {
@@ -61,7 +61,7 @@ func TestStore_LoadError(t *testing.T) {
 }
 
 func TestStore_LoadUnexistingFile(t *testing.T) {
-	s, err := Load("some-dir", "passphrase")
+	s, err := Load("some-dir", []byte("passphrase"))
 
 	if err != nil {
 		t.Fatalf("expected no error got: %v", err)
@@ -107,7 +107,7 @@ func TestStore_Set(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			for key, value := range tt.newKeys {
-				tt.initialStore.Set(key, value)
+				tt.initialStore.Set(key, []byte(value))
 			}
 
 			if len(tt.initialStore.Secrets) != tt.expectedLength {
@@ -233,7 +233,7 @@ func TestStore_Save(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tempDir := t.TempDir()
 			testFile := filepath.Join(tempDir, "store.enc")
-			testPassphrase := "testpassphrase"
+			testPassphrase := []byte("testpassphrase")
 
 			s := &Store{path: testFile}
 			s.Secrets = tt.secrets
@@ -275,10 +275,10 @@ func TestStore_Save(t *testing.T) {
 	t.Run("overwrites existing file", func(t *testing.T) {
 		tempDir := t.TempDir()
 		testFile := filepath.Join(tempDir, "store.enc")
-		testPassphrase := "testpassphrase"
+		testPassphrase := []byte("testpassphrase")
 
 		s := &Store{path: testFile, Secrets: map[string]string{}}
-		s.Set("OPENAI_KEY", "my-openai-key")
+		s.Set("OPENAI_KEY", []byte("my-openai-key"))
 
 		err := s.Save(testPassphrase)
 
@@ -310,7 +310,7 @@ func TestStore_Save(t *testing.T) {
 			t.Errorf("expected %d keys, got %d", 1, len(loaded.Secrets))
 		}
 
-		s.Set("AWS_KEY", "my-aws-key")
+		s.Set("AWS_KEY", []byte("my-aws-key"))
 
 		err = s.Save(testPassphrase)
 
@@ -338,7 +338,7 @@ func TestStore_Save(t *testing.T) {
 
 func TestStore_RoundTrip(t *testing.T) {
 	tempDir := t.TempDir()
-	testPassphrase := "testpassphrase"
+	testPassphrase := []byte("testpassphrase")
 
 	s, err := Load(tempDir, testPassphrase)
 
@@ -350,7 +350,7 @@ func TestStore_RoundTrip(t *testing.T) {
 		t.Fatal("expected non-nil store")
 	}
 
-	s.Set("AWS_KEY", "my-aws-key")
+	s.Set("AWS_KEY", []byte("my-aws-key"))
 	err = s.Save(testPassphrase)
 
 	if err != nil {

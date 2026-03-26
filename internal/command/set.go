@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/matteo-gildone/sigil/internal/store"
 )
 
 var SetCmd = &Command{
@@ -21,32 +23,26 @@ func runSet(args []string) error {
 		return fmt.Errorf("usage: sigil set [-project] KEY")
 	}
 
-	s, passphrase, err := loadStore(*project)
-	if err != nil {
-		return err
-	}
-
-	password, err := prompt("secret:")
-	if err != nil {
-		return err
-	}
-
-	s.Set(setSubcommand.Arg(0), string(password))
-	err = s.Save(passphrase)
-	if err != nil {
-		return fmt.Errorf("failed to save store: %w", err)
-	}
-
-	defer func() {
-		for i := range passphrase {
-			passphrase[i] = 0
+	return withStore(*project, func(s *store.Store, passphrase []byte) error {
+		password, err := prompt("secret:")
+		if err != nil {
+			return err
 		}
 
-		for i := range password {
-			password[i] = 0
+		s.Set(setSubcommand.Arg(0), password)
+		err = s.Save(passphrase)
+		if err != nil {
+			return fmt.Errorf("failed to save store: %w", err)
 		}
-	}()
 
-	fmt.Fprintf(os.Stdout, "saved %q successfully\n", setSubcommand.Arg(0))
-	return nil
+		// zero sensitive bytes after use; string convention inside Set means the value copy inside the store map
+		// can't be zeroed - known limitation
+		defer func() {
+			for i := range password {
+				password[i] = 0
+			}
+		}()
+		fmt.Fprintf(os.Stdout, "saved %q successfully\n", setSubcommand.Arg(0))
+		return nil
+	})
 }
