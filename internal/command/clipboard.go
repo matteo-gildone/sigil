@@ -8,6 +8,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/matteo-gildone/gostyl"
 )
 
 type ClipboardWriter interface {
@@ -35,9 +37,9 @@ func copyToClipboard(writer ClipboardWriter, key, value string, clearAfter int) 
 		return fmt.Errorf("failed to copy to clipboard: %w", err)
 	}
 
-	fmt.Fprintf(os.Stdout, "%q copied to clipboard\n", key)
+	fmt.Fprint(os.Stdout, gostyl.Successf("%q copied to clipboard\n", key))
 	if clearAfter > 0 {
-		fmt.Fprintf(os.Stdout, "clearing clipboard in %d seconds\n", clearAfter)
+		fmt.Fprint(os.Stdout, gostyl.Infof("clearing clipboard in %d seconds\n", clearAfter))
 		var wg sync.WaitGroup
 		wg.Add(1)
 		go func() {
@@ -50,7 +52,7 @@ func copyToClipboard(writer ClipboardWriter, key, value string, clearAfter int) 
 		}()
 
 		wg.Wait()
-		fmt.Fprintln(os.Stdout, "clipboard cleared")
+		fmt.Fprintln(os.Stdout, gostyl.Successln("clipboard cleared"))
 	}
 	return nil
 }

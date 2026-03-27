@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/matteo-gildone/gostyl"
 	"github.com/matteo-gildone/sigil/internal/store"
 )
 
@@ -36,7 +37,7 @@ func runDelete(args []string) error {
 			return fmt.Errorf("failed to save store: %w", err)
 		}
 
-		fmt.Fprintf(os.Stdout, "deleted %q successfully\n", deleteSubcommand.Arg(0))
+		fmt.Fprint(os.Stdout, gostyl.Successf("deleted %q successfully\n", deleteSubcommand.Arg(0)))
 		return nil
 	})
 }

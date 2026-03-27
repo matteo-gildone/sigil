@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/matteo-gildone/gostyl"
 	"github.com/matteo-gildone/sigil/internal/store"
 	"golang.org/x/term"
 )
@@ -23,9 +24,14 @@ func runList(args []string) error {
 
 	return withStore(*project, func(s *store.Store, passphrase []byte) error {
 		if term.IsTerminal(int(os.Stdout.Fd())) {
+			style := gostyl.NewStyle()
+			projectStyle := style.Cyan().Sprint(*project)
+			separatorStyle := style.BrightBlack().Sprint("\u00B7")
 			header := fmt.Sprintf("Secrets \u00B7 %s", *project)
-			fmt.Fprintln(os.Stdout, header)
-			fmt.Fprintln(os.Stdout, strings.Repeat("\u2500", len(header)))
+			styledHeader := style.Bold().Sprintf("Secrets %s %s", separatorStyle, projectStyle)
+
+			fmt.Fprintln(os.Stdout, styledHeader)
+			fmt.Fprintln(os.Stdout, style.BrightBlack().Sprint(strings.Repeat("\u2500", len(header))))
 		}
 
 		for _, key := range s.List() {
