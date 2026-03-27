@@ -25,6 +25,19 @@ func TestCopyToClipboard(t *testing.T) {
 	}
 }
 
+func TestCopyToClipboard_Clear(t *testing.T) {
+	w := &mockWriter{}
+	err := copyToClipboard(w, "MY_KEY", "my-secret", 1)
+
+	if err != nil {
+		t.Fatalf("unexpected error, got %v", err)
+	}
+
+	if len(w.written) != 0 {
+		t.Errorf("expected clipboard to be cleared, got: %q", string(w.written))
+	}
+}
+
 func TestCopyToClipboard_Error(t *testing.T) {
 	err := copyToClipboard(&execWriter{
 		tool: "non-existing-tool",

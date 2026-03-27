@@ -257,7 +257,7 @@ func TestStore_Save(t *testing.T) {
 				t.Fatalf("failed to read file: %v", err)
 			}
 
-			decrypted, err := crypto.Decrypt([]byte(testPassphrase), data)
+			decrypted, err := crypto.Decrypt(testPassphrase, data)
 			if err != nil {
 				t.Fatalf("failed to decrypt file: %v", err)
 			}
@@ -299,7 +299,7 @@ func TestStore_Save(t *testing.T) {
 			t.Fatalf("failed to read file: %v", err)
 		}
 
-		decrypted, err := crypto.Decrypt([]byte(testPassphrase), data)
+		decrypted, err := crypto.Decrypt(testPassphrase, data)
 
 		if err != nil {
 			t.Fatalf("failed to decrypt file: %v", err)
@@ -325,7 +325,7 @@ func TestStore_Save(t *testing.T) {
 			t.Fatalf("failed to read file: %v", err)
 		}
 
-		decrypted, err = crypto.Decrypt([]byte(testPassphrase), data)
+		decrypted, err = crypto.Decrypt(testPassphrase, data)
 		if err != nil {
 			t.Fatalf("failed to decrypt file: %v", err)
 		}
