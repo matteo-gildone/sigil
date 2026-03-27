@@ -44,7 +44,7 @@ func copyToClipboard(writer ClipboardWriter, key, value string, clearAfter int) 
 		go func() {
 			defer wg.Done()
 			for i := clearAfter; i > 0; i-- {
-				fmt.Fprintf(os.Stderr, "\r%s", gostyl.Infof("clearing clipboard in %ds", i))
+				fmt.Fprintf(os.Stderr, "\r%s", gostyl.Infof("clearing clipboard in %2ds", i))
 				time.Sleep(time.Second)
 			}
 			err := writer.Write([]byte(""))
