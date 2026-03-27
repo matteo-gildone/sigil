@@ -27,7 +27,7 @@ func runList(args []string) error {
 			style := gostyl.NewStyle()
 			projectStyle := style.Cyan().Sprint(*project)
 			separatorStyle := style.BrightBlack().Sprint("\u00B7")
-			header := fmt.Sprintf("Secrets \u00B7 %s", *project)
+			header := fmt.Sprintf("Secrets \u00B7 %s", *project) // header is unstyled - used to calculate separator width
 			styledHeader := style.Bold().Sprintf("Secrets %s %s", separatorStyle, projectStyle)
 
 			fmt.Fprintln(os.Stdout, styledHeader)
