@@ -43,7 +43,7 @@ func runSet(args []string) error {
 			return fmt.Errorf("failed to save store: %w", err)
 		}
 
-		fmt.Fprint(os.Stdout, gostyl.Successf("saved %q successfully\n", setSubcommand.Arg(0)))
+		fmt.Fprint(os.Stderr, gostyl.Successf("saved %q successfully\n", setSubcommand.Arg(0)))
 		return nil
 	})
 }

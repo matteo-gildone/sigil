@@ -37,7 +37,7 @@ func copyToClipboard(writer ClipboardWriter, key, value string, clearAfter int) 
 		return fmt.Errorf("failed to copy to clipboard: %w", err)
 	}
 
-	fmt.Fprint(os.Stdout, gostyl.Successf("%q copied to clipboard\n", key))
+	fmt.Fprint(os.Stderr, gostyl.Successf("%q copied to clipboard\n", key))
 	if clearAfter > 0 {
 		var wg sync.WaitGroup
 		wg.Add(1)
@@ -54,7 +54,7 @@ func copyToClipboard(writer ClipboardWriter, key, value string, clearAfter int) 
 		}()
 
 		wg.Wait()
-		fmt.Fprintf(os.Stdout, "\r%s", gostyl.Successln("clipboard cleared                 "))
+		fmt.Fprintf(os.Stderr, "\r%s", gostyl.Successln("clipboard cleared                 "))
 	}
 	return nil
 }
