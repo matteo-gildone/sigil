@@ -1,53 +1,62 @@
 # sigil
 
+![Owing hero image](./img/hero.png)
+
 Local-first, encrypted secrets for developers. No cloud. No daemon. No account.
 
-Store credentials locally and inject them directly into any process — without touching a `.env` file or opening a password manager.
-
-```bash
-sigil set DB_URL "postgres://localhost/myapp"
-```
+Store credentials locally and copy them directly to your clipboard — without touching a `.env` file, exposing values in your terminal, or polluting your shell history.
 
 ## Why
 
 `.env` files get committed. Password managers break your flow. Cloud secret managers are overkill for local development.
 
-`sigil` stores your secrets encrypted on disk and injects them as environment variables when you need them, then gets out of the way.
+`sigil` stores your secrets encrypted on disk. When you need a value, it goes straight to your clipboard and clears itself automatically. Nothing is ever printed to the terminal or written to shell history.
 
 ## Install
-
-### Homebrew
-
-```bash
-brew install yourname/tap/sigil
-```
 
 ### Go
 
 ```bash
-go install github.com/yourname/sigil/cmd/sigil@latest
+go install github.com/matteo-gildone/sigil/cmd/sigil@latest
 ```
 
 ### Download
 
-Grab a binary from the [releases page](https://github.com/yourname/sigil/releases).
+Grab a binary from the [releases page](https://github.com/matteo-gildone/sigil/releases).
 
 ## Usage
 
 ### Store a secret
 
 ```bash
-sigil set KEY VALUE
-sigil set DB_URL "postgres://localhost/myapp"
-sigil set STRIPE_KEY "sk_test_..."
+sigil set KEY
+sigil set DB_URL
+sigil set STRIPE_KEY
 ```
 
-### Retrieve a secret
+You will be prompted for your passphrase and then the secret value. Neither is passed as a command-line argument or written to shell history.
+
+### Copy a secret to clipboard
 
 ```bash
 sigil get KEY
 sigil get DB_URL
 ```
+
+The value is copied to your clipboard and cleared after 15 seconds by default.
+
+```bash
+# change the clear timeout
+sigil get -clear 45 KEY
+
+# disable auto-clear
+sigil get -clear 0 KEY
+
+# use a specific clipboard tool
+sigil get -clip wl-copy KEY
+```
+
+The value is never printed to the terminal.
 
 ### List all keys
 
@@ -61,45 +70,60 @@ sigil list
 sigil delete KEY
 ```
 
-### Inject secrets into a process
-
-```bash
-sigil exec -- <command> [args...]
-
-sigil exec -- go run main.go
-sigil exec -- npm run dev
-sigil exec -- python app.py
-```
-
-All stored secrets are injected as environment variables. The process receives them directly — nothing is written to disk or exposed in your shell history.
-
 ### Projects
 
 Secrets are namespaced by project. The default project is `default`.
 
 ```bash
-sigil set DB_URL "postgres://..." -project myapp
-sigil exec -project myapp -- go run main.go
+sigil set -project myapp DB_URL
+sigil get -project myapp DB_URL
+sigil list -project myapp
+sigil delete -project myapp DB_URL
 ```
+
+## Clipboard
+
+To use a different clipboard tool set the `SIGIL_CLIPBOARD` environment variable:
+
+```bash
+# Linux X11
+export SIGIL_CLIPBOARD="xclip -selection clipboard"
+
+# Linux Wayland
+export SIGIL_CLIPBOARD="wl-copy"
+
+# Windows
+export SIGIL_CLIPBOARD="clip"
+```
+
+Add this to your shell profile (`~/.zshrc`, `~/.bashrc`) to make it permanent. You can also override it per invocation with the `-clip` flag.
 
 ## How it works
 
-Secrets are stored in `~/.local/share/sigil/<project>/store.enc` (XDG-compliant). Each store is encrypted with AES-256-GCM, keyed from your passphrase via PBKDF2. The file on disk is never readable as plain text.
+Secrets are stored in `~/.local/share/sigil/<project>/store.enc` (XDG-compliant). Each store is a single file encrypted with AES-256-GCM, keyed from your passphrase via PBKDF2-SHA256 with 260,000 iterations. The file on disk is never readable as plain text.
 
-When you run `sigil exec`, your secrets are decrypted in memory and passed directly to the target process via `execve`. `sigil` replaces itself with the target process — it does not stay running as a parent.
+When you run `sigil get`, the value is decrypted in memory and passed directly to your clipboard tool. It is never written to disk or printed to stdout.
 
 ## Security
 
-- Encryption: AES-256-GCM (authenticated)
-- Key derivation: PBKDF2-SHA256
-- No secrets are ever written to disk in plaintext
-- No secrets appear in shell history
-- `sigil exec` uses `execve` — no parent process retains secrets after exec
+**What sigil protects against**
+- Secrets in shell history — values are always prompted interactively, never passed as arguments
+- Secrets in your terminal scrollback — values are never printed to stdout
+- Unauthorised file access — the store file is encrypted at rest and readable only by the owner (`0600`)
+
+**Known limitations**
+- The clipboard is readable by any process on your machine. The auto-clear timeout reduces the window but does not eliminate it
+- The passphrase is held in memory as a byte slice for the duration of the operation and zeroed afterward. Go's garbage collector does not guarantee immediate collection, so the window where it is recoverable from memory cannot be fully eliminated
+- The store file is protected by your passphrase. A weak passphrase is vulnerable to offline brute-force attack. PBKDF2 at 260,000 iterations makes this slow but not impossible
+
+**Encryption**
+- Algorithm: AES-256-GCM (authenticated encryption)
+- Key derivation: PBKDF2-SHA256, 260,000 iterations, 16-byte random salt per operation
 
 ## Requirements
 
-- Go 1.21+
-- macOS, Linux, or Windows
+- Go 1.24+
+- A clipboard tool (`pbcopy` on macOS, `xclip` or `wl-copy` on Linux, `clip` on Windows)
 
 ## License
 
