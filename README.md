@@ -125,6 +125,13 @@ When you run `sigil get`, the value is decrypted in memory and passed directly t
 - Go 1.24+
 - A clipboard tool (`pbcopy` on macOS, `xclip` or `wl-copy` on Linux, `clip` on Windows)
 
+## Acknowledgments
+
+**Logo & Illustrations**: Created with the help of Gemini, inspired by the "Mining for Debt" concept.
+
+**The Gopher**: Our favorite mascot was originally designed by the amazing [Renée French](http://reneefrench.blogspot.com/)
+and is used under the Creative Commons 4.0 Attribution license.
+
 ## License
 
 MIT
