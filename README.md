@@ -2,6 +2,11 @@
 
 ![Owing hero image](./img/hero.png)
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/matteo-gildone/sigil.svg)](https://pkg.go.dev/github.com/matteo-gildone/sigil)
+[![Go Report Card](https://goreportcard.com/badge/github.com/matteo-gildone/sigil)](https://goreportcard.com/report/github.com/matteo-gildone/sigil)
+[![GitHub tag](https://img.shields.io/github/v/tag/matteo-gildone/sigil)](https://github.com/matteo-gildone/sigil/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Local-first, encrypted secrets for developers. No cloud. No daemon. No account.
 
 Store credentials locally and copy them directly to your clipboard — without touching a `.env` file, exposing values in your terminal, or polluting your shell history.
